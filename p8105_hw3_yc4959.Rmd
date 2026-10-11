@@ -9,13 +9,16 @@ This is the homework 3!
 #Problem 1
 Load the NOAA data
 ```{r}
+library(patchwork)
+library(ggridges)
+library(tidyverse)
 library(p8105.datasets)
-data("ny_noaa")
 ```
 
 Check the number of rows and columns.
 Check first 5 row of dataset to look variables.
 ```{r}
+data("ny_noaa")
 nrow(ny_noaa)
 ncol(ny_noaa)
 head(ny_noaa)
@@ -34,27 +37,143 @@ Missing data are present in the weather variables, with 145,838 missing values i
 Missing data are big issue in this dataset, especially for the temperature.
 
 
+Separate date into year, month, and day.
+Then check.
 ```{r}
-
-
+ny_noaa =
+  ny_noaa |>
+  separate(date, into = c("year", "month", "day"), sep = "-")
+ny_noaa
 ```
 
+Ensure observations for temperature, precipitation, and snowfall are given in reasonable units.
+Convert temperature to Celsius.
 ```{r}
-
-
+ny_noaa =
+  ny_noaa |>
+  mutate(
+    tmax = as.numeric(tmax) / 10,
+    tmin = as.numeric(tmin) / 10
+  )
 ```
 
+For snowfall, what are the most commonly observed values? Why?
 ```{r}
-
+ny_noaa =
+  ny_noaa |>
+  mutate(prcp = prcp / 10)
 
 ```
+According to the data description, precipitation, maximum temperature, and minimum temperature were originally measured in tenths of their respective units.
+I divided prcp, tmax, and tmin by 10 so that precipitation is measured in millimeters and temperature is measured in degrees Celsius.
+snow and snwd were already measured in millimeters.
+
 
 ```{r}
-
+ny_noaa |>
+  count(snow) |>
+  arrange(desc(n))
 
 ```
+The most commonly observed snowfall value is 0 mm, with 2,008,508 observations.
+I think because most days do not have snowfall.
+
+Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
+
+Keep January and July observations
+```{r}
+ny_noaa_jan_july =
+  ny_noaa |>
+  filter(month == "01" | month == "07")
+```
+
+Calculate average maximum temperature
+In my first attempt, I got NaN values when calculating the mean because some stations had missing tmax values. So I used drop_na(tmax) before calculating the average maximum temperature.
+```{r}
+jan_july_tmax =
+  ny_noaa_jan_july |>
+  drop_na(tmax) |>
+  group_by(id, year, month) |>
+  summarize(mean_tmax = mean(tmax))
+jan_july_tmax
+```
+Change year to numeric
+```{r}
+jan_july_tmax =
+  jan_july_tmax |>
+  mutate(year = as.numeric(year))
+```
+
+Plot average maximum temperature in January and July
 
 ```{r}
+jan_july_tmax |>
+  ggplot(aes(x = year, y = mean_tmax)) +
+  geom_point(alpha = .5) +
+  facet_grid(. ~ month) +
+  labs(
+    title = "Average Maximum Temperature in January and July",
+    x = "Year",
+    y = "Average Maximum Temperature (C)"
+  ) +
+  scale_x_continuous(
+    breaks = c(1981, 1990, 2000, 2010)
+  ) +
+  theme_minimal()
+```
+Average maximum temperatures are much lower in January than in July.
+Average temperatures in January range from -10°C to 10°C, while average temperatures in July range from 20°C to 30°C.
+There are some outliers.A January value around -13°C and a July value around 14°C.
 
 
+Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); 
+
+Remove missing temperature values
+```{r}
+tmax_tmin =
+  ny_noaa |>
+  drop_na(tmax, tmin)
+```
+
+Plot maximum and minimum temperature
+```{r}
+tmax_tmin_plot =
+  tmax_tmin |>
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_hex() +
+  labs(
+    title = "Maximum vs Minimum Temperature",
+    x = "Minimum Temperature (C)",
+    y = "Maximum Temperature (C)"
+  ) +
+  theme_minimal()
+```
+and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
+
+Keep snowfall values between 0 and 100 mm
+Change year to a factor
+```{r}
+snowfall_df =
+  ny_noaa |>
+  filter(snow > 0, snow < 100) |>
+  mutate(year = factor(year))
+```
+
+Plot snowfall distribution by year
+```{r}
+snowfall_plot =
+  snowfall_df |>
+  ggplot(aes(x = snow, y = year)) +
+  geom_density_ridges(scale = .85) +
+  labs(
+    title = "Snowfall Distribution by Year",
+    x = "Snowfall (mm)",
+    y = "Year"
+  ) +
+  theme_minimal()
+```
+
+Combine the two plots
+```{r}
+snowfall_plot + tmax_tmin_plot
 ```
