@@ -43,7 +43,6 @@ Then check.
 ny_noaa =
   ny_noaa |>
   separate(date, into = c("year", "month", "day"), sep = "-")
-ny_noaa
 ```
 
 Ensure observations for temperature, precipitation, and snowfall are given in reasonable units.
@@ -62,7 +61,6 @@ For snowfall, what are the most commonly observed values? Why?
 ny_noaa =
   ny_noaa |>
   mutate(prcp = prcp / 10)
-
 ```
 According to the data description, precipitation, maximum temperature, and minimum temperature were originally measured in tenths of their respective units.
 I divided prcp, tmax, and tmin by 10 so that precipitation is measured in millimeters and temperature is measured in degrees Celsius.
@@ -73,7 +71,6 @@ snow and snwd were already measured in millimeters.
 ny_noaa |>
   count(snow) |>
   arrange(desc(n))
-
 ```
 The most commonly observed snowfall value is 0 mm, with 2,008,508 observations.
 I think because most days do not have snowfall.
@@ -95,7 +92,6 @@ jan_july_tmax =
   drop_na(tmax) |>
   group_by(id, year, month) |>
   summarize(mean_tmax = mean(tmax))
-jan_july_tmax
 ```
 Change year to numeric
 ```{r}
@@ -250,20 +246,122 @@ merged_df =
   )
 ```
 
+Produce a reader-friendly table for the number of men and women in each education category
 
-
-
+Keep one row for each participant
 ```{r}
-
+participant_df =
+  merged_df |>
+  distinct(SEQN, sex, age, BMI, education)
 ```
 
+Count participants by education and sex
 ```{r}
-merged_df
+participant_table =
+  participant_df |>
+  count(education, sex) |>
+  pivot_wider(
+    names_from = sex,
+    values_from = n
+  )
+participant_table
 ```
 
+create a visualization of the age distributions for men and women in each education category
+
+Plot age distributions by sex and education
 ```{r}
-merged_df
+participant_df |>
+  ggplot(aes(x = sex, y = age)) +
+  geom_boxplot() +
+  facet_grid(. ~ education) +
+  labs(
+    title = "Age Distribution by Sex and Education",
+    x = "Sex",
+    y = "Age"
+  ) +
+  theme_minimal()
 ```
+In the "less than high school" and "more than high school" groups, the number of males and females is about the same. 
+In the "high school equivalent" group, there are more males than females. 
+
+The age distribution shows that participants with less than high school education are generally older, while participants with more than high school education are generally younger. 
+
+In the "high school equivalent" group, females are generally older than males.
+
+
+Calculate total activity for each participant
+```{r}
+total_activity_df =
+  merged_df |>
+  group_by(SEQN, sex, age, education) |>
+  summarize(total_activity = sum(MIMS))
+```
+Plot these total activities (y-axis) against age (x-axis); your plot should compare men to women and have separate panels for each education level. Include a trend line or a smooth.
+
+Plot total activity against age
+```{r}
+total_activity_df |>
+  ggplot(aes(x = age, y = total_activity, color = sex)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  facet_grid(. ~ education) +
+  labs(
+    title = "Total Activity by Age, Sex, and Education",
+    x = "Age",
+    y = "Total Activity",
+    color = "Sex"
+  ) +
+  theme_minimal()
+```
+In all three education groups, total activity decreases as people get older. There are some differences between males and females, but the pattern is different in each group. Overall, older participants have lower total activity than younger participants.
+
+
+Make a three-panel plot that shows the 24-hour activity time courses for each education level and use color to indicate sex. 
+
+Calculate average activity for each minute
+```{r}
+activity_time_df =
+  merged_df |>
+  group_by(education, sex, minute) |>
+  summarize(mean_MIMS = mean(MIMS)) |>
+  ungroup()
+```
+Plot 24-hour activity time courses
+```{r}
+activity_time_df |>
+  ggplot(aes(x = minute, y = mean_MIMS, color = sex)) +
+  geom_line() +
+  facet_grid(. ~ education) +
+  labs(
+    title = "24-Hour Activity by Sex and Education",
+    x = "Minute",
+    y = "Mean MIMS",
+    color = "Sex"
+  ) +
+  theme_minimal()
+```
+Activity is low at night. It goes up quickly in the morning, stays high during the day, and goes down in the evening. 
+
+In the "more than high school" group, females usually have more activity during the day.
+
 
 #Problem 3
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
 
