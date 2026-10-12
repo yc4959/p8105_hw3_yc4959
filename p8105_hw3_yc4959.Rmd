@@ -117,6 +117,7 @@ jan_july_tmax |>
   ) +
   theme_minimal()
 ```
+
 Average maximum temperatures are much lower in January than in July.
 Average temperatures in January range from -10°C to 10°C, while average temperatures in July range from 20°C to 30°C.
 There are some outliers.A January value around -13°C and a July value around 14°C.
@@ -208,6 +209,21 @@ accelerometer_df =
   )
 ```
 
+After knitting the document, I found that the 24-hour activity plot did not display the time correctly because the minute variable was stored as character values. Therefore, I further cleaned the minute variable before the analysis.
+```{r}
+accelerometer_df =
+  accelerometer_df |>
+  separate(
+    minute,
+    into = c("min", "minute"),
+    sep = 3
+  )
+accelerometer_df =
+  accelerometer_df |>
+  mutate(minute = as.numeric(minute)) |>
+  select(-min)
+head(accelerometer_df)
+```
 
 Merge demographic and accelerometer data
 ```{r}
@@ -282,6 +298,7 @@ participant_df |>
   ) +
   theme_minimal()
 ```
+
 In the "less than high school" and "more than high school" groups, the number of males and females is about the same. 
 In the "high school equivalent" group, there are more males than females. 
 
@@ -314,6 +331,7 @@ total_activity_df |>
   ) +
   theme_minimal()
 ```
+
 In all three education groups, total activity decreases as people get older. There are some differences between males and females, but the pattern is different in each group. Overall, older participants have lower total activity than younger participants.
 
 
@@ -333,16 +351,21 @@ activity_time_df |>
   ggplot(aes(x = minute, y = mean_MIMS, color = sex)) +
   geom_line() +
   facet_grid(. ~ education) +
+  scale_x_continuous(
+    breaks = c(0, 360, 720, 1080, 1440),
+    labels = c("0", "6", "12", "18", "24")
+  ) +
   labs(
     title = "24-Hour Activity by Sex and Education",
-    x = "Minute",
+    x = "Hour",
     y = "Mean MIMS",
     color = "Sex"
   ) +
   theme_minimal()
 ```
-Activity is low at night. It goes up quickly in the morning, stays high during the day, and goes down in the evening. 
 
+Activity is low at night. It goes up quickly in the morning, stays high during the day, and goes down in the evening. 
+The daily pattern is similar in all three education groups. There are some differences between males and females.
 In the "more than high school" group, females usually have more activity during the day.
 
 
