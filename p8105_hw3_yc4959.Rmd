@@ -370,7 +370,79 @@ In the "more than high school" group, females usually have more activity during 
 
 
 #Problem 3
+Read Citi Bike data
+```{r}
+jan_2020_df = read_csv("./data/Jan 2020 Citi.csv")
+july_2020_df = read_csv("./data/July 2020 Citi.csv")
+jan_2024_df = read_csv("./data/Jan 2024 Citi.csv")
+july_2024_df = read_csv("./data/July 2024 Citi.csv")
+```
+Check Citi Bike data
+```{r}
+head(jan_2020_df)
+head(july_2020_df)
+head(jan_2024_df)
+head(july_2024_df)
+```
 
+Produce a reader-friendly table showing the total number of rides in each combination of year and month separating casual riders and Citi Bike members. Comment on these results.
+
+Add year and month
+```{r}
+jan_2020_df =
+  jan_2020_df |>
+  mutate(
+    year = 2020,
+    month = "January"
+  )
+
+july_2020_df =
+  july_2020_df |>
+  mutate(
+    year = 2020,
+    month = "July"
+  )
+
+jan_2024_df =
+  jan_2024_df |>
+  mutate(
+    year = 2024,
+    month = "January"
+  )
+
+july_2024_df =
+  july_2024_df |>
+  mutate(
+    year = 2024,
+    month = "July"
+  )
+```
+
+Combine Citi Bike data
+```{r}
+citi_df =
+  bind_rows(
+    jan_2020_df,
+    july_2020_df,
+    jan_2024_df,
+    july_2024_df
+  )
+head(citi_df)
+```
+
+Check year and month
+```{r}
+citi_df |>
+  count(year, month)
+```
+Check the size of the combined data
+```{r}
+nrow(citi_df)
+ncol(citi_df)
+```
+The combined Citi Bike dataset has 99,485 rides and 9 variables. 
+The data comes from January and July in both 2020 and 2024. 
+These variables are ride ID, bike type, weekday, ride duration, start and end station names, membership type, year, and month.
 ```{r}
 
 ```
@@ -378,13 +450,3 @@ In the "more than high school" group, females usually have more activity during 
 ```{r}
 
 ```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-
