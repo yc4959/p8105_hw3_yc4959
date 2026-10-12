@@ -177,3 +177,93 @@ Combine the two plots
 ```{r}
 snowfall_plot + tmax_tmin_plot
 ```
+
+#Problem 2
+
+Read demographic data and accelerometer data and check
+
+I checked the first five rows of the demographic data and found that the first four rows contain variable descriptions and coding information. Therefore, I skipped the first four rows.
+```{r}
+demographic_df = read_csv("./data/nhanes_covar.csv", skip = 4)
+accelerometer_df = read_csv("./data/nhanes_accel.csv")
+head(demographic_df)
+head(accelerometer_df)
+```
+
+
+Load, tidy, merge, and otherwise organize the data sets. Your final dataset should include all originally observed variables；
+
+exclude participants less than 21 years of age, and those with missing demographic data
+```{r}
+demographic_df =
+  demographic_df |>
+  filter(age >= 21) |>
+  drop_na()
+```
+
+Tidy accelerometer data
+```{r}
+accelerometer_df =
+  accelerometer_df |>
+  pivot_longer(
+    min1:min1440,
+    names_to = "minute",
+    values_to = "MIMS"
+  )
+```
+
+
+Merge demographic and accelerometer data
+```{r}
+merged_df =
+  left_join(demographic_df, accelerometer_df, by = "SEQN")
+```
+
+Change sex to a factor
+```{r}
+merged_df =
+  merged_df |>
+  mutate(
+    sex = factor(
+      sex,
+      levels = c(1, 2),
+      labels = c("Male", "Female")
+    )
+  )
+```
+
+Change education to an ordered factor
+```{r}
+merged_df =
+  merged_df |>
+  mutate(
+    education = factor(
+      education,
+      levels = c(1, 2, 3),
+      labels = c(
+        "Less than high school",
+        "High school equivalent",
+        "More than high school"
+      ),
+      ordered = TRUE
+    )
+  )
+```
+
+
+
+
+```{r}
+
+```
+
+```{r}
+merged_df
+```
+
+```{r}
+merged_df
+```
+
+#Problem 3
+
