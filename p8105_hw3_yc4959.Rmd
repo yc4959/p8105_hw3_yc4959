@@ -494,6 +494,7 @@ median_duration_df =
   ungroup()
 ```
 Order weekdays
+I changed the weekday labels to shorter names to make the x-axis easier to read.
 ```{r}
 median_duration_df =
   median_duration_df |>
@@ -503,6 +504,10 @@ median_duration_df =
       levels = c(
         "Monday", "Tuesday", "Wednesday", "Thursday",
         "Friday", "Saturday", "Sunday"
+      ),
+      labels = c(
+        "Mon", "Tue", "Wed", "Thu",
+        "Fri", "Sat", "Sun"
       ),
       ordered = TRUE
     )
@@ -523,6 +528,8 @@ median_duration_df |>
   ) +
   theme_minimal()
 ```
+
+Median ride duration is higher in July than in January for both years. Ride duration is also generally higher in 2020 than in 2024. Weekend rides, especially on Saturday and Sunday, tend to have longer median durations than weekday rides.
 
 There were relatively few electric Citi Bikes in 2020, but many more are available now. For data in 2024, make a figure that shows the impact of month, membership status, and bike type on the distribution of ride duration. Comment on your results.
 
