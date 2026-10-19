@@ -6,7 +6,7 @@ output: github_document
 ---
 This is the homework 3!
 
-#Problem 1
+# Problem 1
 Load the NOAA data
 ```{r}
 library(patchwork)
@@ -174,8 +174,11 @@ Combine the two plots
 ```{r}
 snowfall_plot + tmax_tmin_plot
 ```
+Maximum and minimum temperatures have a strong positive relationship. Most observations are concentrated along a clear increasing pattern.
 
-#Problem 2
+For snowfall between 0 and 100 mm, smaller snowfall amounts are more common in most years. The overall distributions are similar across years.
+
+# Problem 2
 
 Read demographic data and accelerometer data and check
 
@@ -280,7 +283,8 @@ participant_table =
     names_from = sex,
     values_from = n
   )
-participant_table
+participant_table |>
+  knitr::kable()
 ```
 
 create a visualization of the age distributions for men and women in each education category
@@ -370,7 +374,7 @@ The daily pattern is similar in all three education groups. There are some diffe
 In the "more than high school" group, females usually have more activity during the day.
 
 
-#Problem 3
+# Problem 3
 Read Citi Bike data
 ```{r}
 jan_2020_df = read_csv("./data/Jan 2020 Citi.csv")
@@ -378,13 +382,7 @@ july_2020_df = read_csv("./data/July 2020 Citi.csv")
 jan_2024_df = read_csv("./data/Jan 2024 Citi.csv")
 july_2024_df = read_csv("./data/July 2024 Citi.csv")
 ```
-Check Citi Bike data
-```{r}
-head(jan_2020_df)
-head(july_2020_df)
-head(jan_2024_df)
-head(july_2024_df)
-```
+
 
 Add year and month
 ```{r}
@@ -458,7 +456,8 @@ ride_count_table =
     names_from = member_casual,
     values_from = n
   )
-ride_count_table
+ride_count_table |>
+  knitr::kable()
 ```
 
 There are more member rides than casual rides in all four groups. 
@@ -478,7 +477,8 @@ Count 5 most popular starting station
 july_2024 |>
   count(start_station_name) |>
   arrange(desc(n)) |>
-  head(5)
+  head(5) |>
+  knitr::kable()
 ```
 
 These are the top five starting stations in July 2024.
